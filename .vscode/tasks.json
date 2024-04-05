@@ -4,9 +4,10 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "npm",
-			"script": "watch",
-			"problemMatcher": "$tsc-watch",
+			"label": "watch",
+			"type": "shell",
+			"command": "pnpm run watch",
+			"problemMatcher": "$ts-webpack",
 			"isBackground": true,
 			"presentation": {
 				"reveal": "never"

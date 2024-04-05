@@ -8,8 +8,6 @@ import { QueryEngine } from "@comunica/query-sparql";
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "turtlesense" is now active!');
-
 	// Register completion item provider
 	context.subscriptions.push(
 		vscode.languages.registerCompletionItemProvider(
@@ -18,7 +16,10 @@ export function activate(context: vscode.ExtensionContext) {
 			":" // Trigger character(s) for activating IntelliSense
 		)
 	);
+
+	console.log('Congratulations, the extension "turtlesense" is now active!');
 }
+
 // Query for all subjects defined in the RDF data
 async function querySubjectsFromIRI(
 	iri: string
@@ -73,9 +74,11 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 	): vscode.ProviderResult<
 		vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>
 	> {
+		console.log("prefixes loading1...");
 		const completionItems: vscode.CompletionItem[] = [];
 		// Create a readable stream from the RDF data
 		const stream = Readable.from(document.getText());
+		console.log("prefixes loading2...");
 
 		// Create a new RDF parser
 		const parser = rdfParser.parse(stream, {
@@ -89,6 +92,7 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 			prefixes[prefix] = iri.value;
 		});
 
+		console.log("prefixes loading", prefixes);
 		// Await for parsing to complete
 		await new Promise<void>((resolve, reject) => {
 			parser.on("error", reject);
@@ -100,6 +104,7 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 		const words = phrase.split(":");
 		const prefix = words[0];
 		if (prefixes[prefix] !== undefined) {
+			console.log("prefixes", prefixes);
 			const subjects = await querySubjectsFromIRI(prefixes[prefix]);
 			subjects.forEach((subject) => {
 				const completionItem = createCompletionItem(
