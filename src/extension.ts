@@ -100,9 +100,9 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 		const phrase = document.getText(wordRange);
 		const words = phrase.split(":");
 		const prefix = words[0];
-		console.debug("prefixes requested", prefix);
+		console.debug("prefix requested", prefix);
+		console.debug("prefixes detected", prefixes);
 		if (prefixes[prefix] !== undefined) {
-			console.debug("prefixes", prefixes);
 			const subjects = await querySubjectsFromIRI(prefixes[prefix]);
 			subjects.forEach((subject) => {
 				const completionItem = createCompletionItem(
