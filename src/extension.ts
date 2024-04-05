@@ -74,11 +74,9 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 	): vscode.ProviderResult<
 		vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>
 	> {
-		console.log("prefixes loading1...");
 		const completionItems: vscode.CompletionItem[] = [];
 		// Create a readable stream from the RDF data
 		const stream = Readable.from(document.getText());
-		console.log("prefixes loading2...");
 
 		// Create a new RDF parser
 		const parser = rdfParser.parse(stream, {
@@ -92,7 +90,6 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 			prefixes[prefix] = iri.value;
 		});
 
-		console.log("prefixes loading", prefixes);
 		// Await for parsing to complete
 		await new Promise<void>((resolve, reject) => {
 			parser.on("error", reject);
@@ -103,8 +100,9 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 		const phrase = document.getText(wordRange);
 		const words = phrase.split(":");
 		const prefix = words[0];
+		console.debug("prefixes requested", prefix);
 		if (prefixes[prefix] !== undefined) {
-			console.log("prefixes", prefixes);
+			console.debug("prefixes", prefixes);
 			const subjects = await querySubjectsFromIRI(prefixes[prefix]);
 			subjects.forEach((subject) => {
 				const completionItem = createCompletionItem(
