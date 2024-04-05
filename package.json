@@ -24,7 +24,9 @@
 		"watch": "webpack --mode none --watch",
 		"pretest": "pnpm run compile && pnpm run lint",
 		"lint": "eslint src --ext ts",
-		"test": "vscode-test"
+		"test": "vscode-test",
+		"package": "pnpm vsce package --no-dependencies",
+		"publish": "pnpm vsce publish --no-dependencies"
 	},
 	"devDependencies": {
 		"@comunica/query-sparql": "^3.0.1",
