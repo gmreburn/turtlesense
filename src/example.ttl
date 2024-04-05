@@ -1,0 +1,21 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org/> .
+
+ex:Person rdf:type rdfs:Class .
+
+ex:John rdf:type ex:Person ;
+    ex:hasAge 30 ;
+    ex:hasFriend ex:Jane .
+
+ex:Jane rdf:type ex:Person ;
+    ex:hasAge 28 ;
+    ex:hasFriend ex:John .
+
+ex:hasAge rdf:type rdf:Property ;
+    rdfs:domain ex:Person ;
+    rdfs:range xsd:integer .
+
+ex:hasFriend rdf:type rdf:Property ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person .
