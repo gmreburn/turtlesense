@@ -2,6 +2,10 @@
 	"name": "turtlesense",
 	"displayName": "Turtle Sense",
 	"description": "Turtle Sense provides intelligent code completion and suggestions for TTL (Turtle) files in Visual Studio Code.",
+	"repository": {
+		"type": "",
+		"url": "https://github.com/gmreburn/turtlesense"
+	},
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.87.0"
@@ -13,14 +17,6 @@
 		"onLanguage:turtle"
 	],
 	"main": "./out/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "rdflang.helloWorld",
-				"title": "Hello World"
-			}
-		]
-	},
 	"scripts": {
 		"vscode:prepublish": "pnpm run compile",
 		"compile": "tsc -p ./",
@@ -39,9 +35,7 @@
 		"@vscode/test-electron": "^2.3.9",
 		"eslint": "^8.57.0",
 		"rdf-parse": "^2.3.3",
-		"typescript": "^5.3.3"
-	},
-	"dependencies": {
+		"typescript": "^5.3.3",
 		"@comunica/query-sparql": "^3.0.1"
 	}
 }
