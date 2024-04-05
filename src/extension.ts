@@ -91,17 +91,19 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 		});
 
 		// Await for parsing to complete
-		await new Promise<void>((resolve, reject) => {
-			parser.on("error", reject);
+		await new Promise<void>((resolve) => {
+			parser.on("error", resolve);
 			parser.on("data", resolve);
 		});
 
 		var wordRange = document.getWordRangeAtPosition(position);
 		const phrase = document.getText(wordRange);
-		const words = phrase.split(":");
+		console.debug("turtlesense:: phrase", phrase);
+		const words = phrase.split(context.triggerCharacter ?? ":");
+		console.debug("turtlesense:: prefix words", words);
 		const prefix = words[0];
-		console.debug("prefix requested", prefix);
-		console.debug("prefixes detected", prefixes);
+		console.debug("turtlesense:: prefix requested", prefix);
+		console.debug("turtlesense:: prefixes detected", prefixes);
 		if (prefixes[prefix] !== undefined) {
 			const subjects = await querySubjectsFromIRI(prefixes[prefix]);
 			subjects.forEach((subject) => {
