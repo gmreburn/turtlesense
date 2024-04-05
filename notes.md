@@ -15,3 +15,10 @@ Press F5, that should open a new vscode window.. open the ~/src/example.ttl file
 Create a publisher identity and publish v1 of the extension - https://code.visualstudio.com/api/working-with-extensions/publishing-extension#create-a-publisher
 
 infer more context: which part of the tripple is the user? Is this the Object, Subject or predicate? If a predicate, the scope can be limited to the range of the subject. As for the object, could you somehow query for valid ids? Would this be helpful/make sense in the context of vocabulary definition as well as when defining graphs?
+
+# Ready to publish a new version?
+
+- update the version in package.json
+- update CHANGELOG.md
+- create/verify marketplace authentication - https://code.visualstudio.com/api/working-with-extensions/publishing-extension#get-a-personal-access-token
+- run `vsce publish` in the command line - install if missing via `pnpm install -g @vscode/vsce`
