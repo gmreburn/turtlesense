@@ -1,5 +1,6 @@
 {
 	"name": "turtlesense",
+	"publisher": "greburn",
 	"displayName": "Turtle Sense",
 	"description": "Turtle Sense provides intelligent code completion and suggestions for TTL (Turtle) files in Visual Studio Code.",
 	"repository": {
