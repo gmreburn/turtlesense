@@ -1,6 +1,17 @@
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . #works with rdfs:comment
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> . #works with rdfs:comment
 @prefix ex: <http://example.org/> .
+# @prefix bf: http://bibfra.me/vocab/lite/ .
+# @prefix scholar: http://bibfra.me/vocab/scholar/ .
+# @prefix library: http://bibfra.me/vocab/marc/ .
+# @prefix link: http://library.link/identifier/ .
+@prefix dc: <http://purl.org/dc/terms/> . #works with rdfs:comment
+@prefix schema: <http://schema.org/> . #not compatible from what I can tell
+@prefix owl: <http://www.w3.org/2002/07/owl#> . #works with rdfs:comment
+@prefix loc: <http://id.loc.gov/ontologies/bibframe/> . #works with skos:definition
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> . #works with skos:definition
+@prefix oa: <http://www.w3.org/ns/oa#> . #works with rdfs:comment
+@prefix foaf: <http://xmlns.com/foaf/0.1/> . #works with rdfs:comment
 
 ex:Person rdf:type rdfs:Class .
 

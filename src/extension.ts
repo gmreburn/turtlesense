@@ -23,18 +23,20 @@ export function activate(context: vscode.ExtensionContext) {
 // Query for all subjects defined in the RDF data
 async function querySubjectsFromIRI(
 	iri: string
-): Promise<{ label: string; description: string }[]> {
+): Promise<{ label: string; description: string; definition: string }[]> {
 	try {
 		const comunicaEngine = new QueryEngine();
 
 		// Construct SPARQL query
 		const query = `
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-            SELECT ?s ?label ?description
+			PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT ?s ?label ?description ?definition
             WHERE {
                 ?s ?p <${iri}>.
                 OPTIONAL { ?s rdfs:label ?label. }
                 OPTIONAL { ?s rdfs:comment ?description. }
+                OPTIONAL { ?s skos:definition ?definition. }
             } LIMIT 100`;
 
 		// Execute SPARQL query
@@ -43,15 +45,22 @@ async function querySubjectsFromIRI(
 		});
 
 		// Store results
-		const subjects: { label: string; description: string }[] = [];
+		const subjects: {
+			label: string;
+			description: string;
+			definition: string;
+		}[] = [];
 
 		// Extract labels and descriptions from query results
 		for await (const binding of bindingsStream) {
 			const label = binding.has("label") ? binding.get("label")!.value : "";
+			const definition = binding.has("definition")
+				? binding.get("definition")!.value
+				: "";
 			const description = binding.has("description")
 				? binding.get("description")!.value
 				: "";
-			subjects.push({ label, description });
+			subjects.push({ label, description, definition });
 		}
 
 		return subjects;
@@ -109,7 +118,8 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 			subjects.forEach((subject) => {
 				const completionItem = createCompletionItem(
 					`${prefix}:${subject.label}`,
-					subject.description
+					subject.description,
+					subject.definition
 				);
 				completionItems.push(completionItem);
 			});
@@ -121,13 +131,17 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 
 function createCompletionItem(
 	label: string,
-	detail: string
+	detail: string,
+	documentation: string
 ): vscode.CompletionItem {
-	const completionItem = new vscode.CompletionItem(label);
-	completionItem.detail = detail;
-	completionItem.kind = vscode.CompletionItemKind.Variable;
-	completionItem.documentation = new vscode.MarkdownString(
-		`Inserts "${label}" - ${detail}`
+	const completionItem = new vscode.CompletionItem(
+		label,
+		vscode.CompletionItemKind.Class
 	);
+	completionItem.detail = detail;
+	completionItem.documentation = new vscode.MarkdownString(
+		`Inserts "${label}" - ${documentation || detail}`
+	);
+
 	return completionItem;
 }

@@ -22,3 +22,8 @@ infer more context: which part of the tripple is the user? Is this the Object, S
 - update CHANGELOG.md
 - create/verify marketplace authentication - https://code.visualstudio.com/api/working-with-extensions/publishing-extension#get-a-personal-access-token
 - run `vsce publish` in the command line - install if missing via `pnpm install -g @vscode/vsce`
+
+## Fetch a remote ontology to view basic info
+
+- `pnpm install -g @comunica/query-sparql`
+- `comunica-sparql http://xmlns.com/foaf/0.1/ "SELECT * WHERE { ?s ?p ?o } LIMIT 100"`
