@@ -96,7 +96,7 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 			parser.on("data", resolve);
 		});
 
-		var wordRange = document.getWordRangeAtPosition(position);
+		var wordRange = document.getWordRangeAtPosition(position, /(\S*):(\S*)/);
 		const phrase = document.getText(wordRange);
 		console.debug("turtlesense:: phrase", phrase);
 		const words = phrase.split(context.triggerCharacter ?? ":");
