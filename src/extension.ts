@@ -23,7 +23,9 @@ export function activate(context: vscode.ExtensionContext) {
 // Query for all subjects defined in the RDF data
 async function querySubjectsFromIRI(
 	iri: string
-): Promise<{ label: string; description: string; definition: string }[]> {
+): Promise<
+	{ label: string; type: string; description: string; definition: string }[]
+> {
 	try {
 		const comunicaEngine = new QueryEngine();
 
@@ -31,9 +33,10 @@ async function querySubjectsFromIRI(
 		const query = `
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 			PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            SELECT ?s ?label ?description ?definition
+            SELECT ?s ?type ?label ?description ?definition
             WHERE {
                 ?s ?p <${iri}>.
+				OPTIONAL { ?s rdf:type ?type. }
                 OPTIONAL { ?s rdfs:label ?label. }
                 OPTIONAL { ?s rdfs:comment ?description. }
                 OPTIONAL { ?s skos:definition ?definition. }
@@ -47,6 +50,7 @@ async function querySubjectsFromIRI(
 		// Store results
 		const subjects: {
 			label: string;
+			type: string;
 			description: string;
 			definition: string;
 		}[] = [];
@@ -60,7 +64,8 @@ async function querySubjectsFromIRI(
 			const description = binding.has("description")
 				? binding.get("description")!.value
 				: "";
-			subjects.push({ label, description, definition });
+			const type = binding.has("type") ? binding.get("type")!.value : "";
+			subjects.push({ label, type, description, definition });
 		}
 
 		return subjects;
@@ -119,7 +124,8 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 				const completionItem = createCompletionItem(
 					`${prefix}:${subject.label}`,
 					subject.description,
-					subject.definition
+					subject.definition,
+					subject.type
 				);
 				completionItems.push(completionItem);
 			});
@@ -132,15 +138,18 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 function createCompletionItem(
 	label: string,
 	detail: string,
-	documentation: string
+	documentation: string,
+	type: string
 ): vscode.CompletionItem {
 	const completionItem = new vscode.CompletionItem(
 		label,
-		vscode.CompletionItemKind.Class
+		type === "http://www.w3.org/2000/01/rdf-schema#Class"
+			? vscode.CompletionItemKind.Class
+			: vscode.CompletionItemKind.Property
 	);
 	completionItem.detail = detail;
 	completionItem.documentation = new vscode.MarkdownString(
-		`Inserts "${label}" - ${documentation || detail}`
+		`Inserts "${label}" ${type}- ${documentation || detail}`
 	);
 
 	return completionItem;

@@ -7,7 +7,8 @@
 		"type": "",
 		"url": "https://github.com/gmreburn/turtlesense"
 	},
-	"version": "0.0.8",
+	"icon": "icon.jpg",
+	"version": "0.0.9",
 	"engines": {
 		"vscode": "^1.87.0"
 	},

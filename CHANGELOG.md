@@ -4,6 +4,11 @@ All notable changes to the "turtlesense" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.9]
+
+- New turtle sense icon.
+- Set IntelliSense kind (the icon/logo next to suggestion) based on subject's type (class or property).
+
 ## [0.0.8]
 
 - add support for skos:definition

@@ -6,11 +6,11 @@ Turtle Sense is a Visual Studio Code extension designed to enhance your experien
 
 Turtle Sense provides the following features:
 
-- IntelliSense support for TTL (Turtle) files, including auto-completion for keywords, predicates, and entities.
+- IntelliSense support for TTL (Turtle) files, including auto-completion for keywords, predicates, and entities. The file must be recongized as Turtle syntax through that installed language.
 
 ## Requirements
 
-There are no specific requirements or dependencies for this extension.
+This extension will only activate when the IDE detects that a Turtle file is opened. We recommend installing [Turtle Language Server](https://marketplace.visualstudio.com/items?itemName=stardog-union.vscode-langserver-turtle) to help the IDE recongize the file.
 
 ## Extension Settings
 
