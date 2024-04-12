@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import rdfParser from "rdf-parse";
 import { Readable } from "stream";
 import { QueryEngine } from "@comunica/query-sparql";
+import { TurtleParser } from "millan";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -74,6 +75,12 @@ async function querySubjectsFromIRI(
 		throw error;
 	}
 }
+enum TokenType {
+	Subject,
+	Predicate,
+	Object,
+	None,
+}
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
@@ -111,6 +118,47 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 		return this.getCompletionItems(prefixes, document, position, context);
 	}
 
+	getTokenType(
+		document: vscode.TextDocument,
+		position: vscode.Position
+	): TokenType {
+		// console.table(tokens.filter((t) => t.startLine >= 18 && t.startLine <= 20));
+		const turtleParser = new TurtleParser();
+		const tokens = turtleParser.tokenize(document.getText());
+
+		const tokenIndex = tokens.findIndex(
+			(t) =>
+				t.startLine &&
+				t.startColumn &&
+				t.endLine &&
+				t.endColumn &&
+				position.isAfterOrEqual(
+					new vscode.Position(t.startLine - 1, t.startColumn - 1)
+				) &&
+				position.isBefore(new vscode.Position(t.endLine - 1, t.endColumn - 1))
+		);
+		// console.table([
+		// 	tokens[tokenIndex - 4],
+		// 	tokens[tokenIndex - 3],
+		// 	tokens[tokenIndex - 2],
+		// 	tokens[tokenIndex - 1],
+		// 	tokens[tokenIndex],
+		// ]);
+		if (tokens[tokenIndex - 1].image === ";") {
+			return TokenType.Predicate;
+		} else if (tokens[tokenIndex - 2].image === ";") {
+			return TokenType.Object;
+		} else if (tokens[tokenIndex - 1].image === ".") {
+			return TokenType.Subject;
+		} else if (tokens[tokenIndex - 2].image === ".") {
+			return TokenType.Predicate;
+		} else if (tokens[tokenIndex - 3].image === ".") {
+			return TokenType.Object;
+		}
+
+		return TokenType.None;
+	}
+
 	// Created this to abstract from how the prefixes are attained. This function can be reused in other formats besides turtle
 	// TODO: read prefixes from class property instead of passing it?
 	async getCompletionItems(
@@ -122,15 +170,16 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 		const completionItems: vscode.CompletionItem[] = [];
 		var wordRange = document.getWordRangeAtPosition(position, /(\S*):(\S*)/);
 		const phrase = document.getText(wordRange);
-		console.debug("turtlesense:: phrase", phrase);
+		// console.debug("turtlesense:: phrase", phrase);
 		const words = phrase.split(context.triggerCharacter ?? ":");
-		console.debug("turtlesense:: prefix words", words);
+		// console.debug("turtlesense:: prefix words", words);
 		const prefix = words[0];
-		console.debug("turtlesense:: prefix requested", prefix);
-		console.debug("turtlesense:: prefixes detected", prefixes);
+		// console.debug("turtlesense:: prefix requested", prefix);
+		// console.debug("turtlesense:: prefixes detected", prefixes);
 
 		if (prefixes[prefix] !== undefined) {
 			const subjects = await querySubjectsFromIRI(prefixes[prefix]);
+			const tokenType = this.getTokenType(document, position);
 			subjects.forEach((subject) => {
 				const completionItem = createCompletionItem(
 					`${prefix}:${subject.label}`,
@@ -138,6 +187,18 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 					subject.definition,
 					subject.type
 				);
+				if (
+					tokenType === TokenType.Predicate &&
+					completionItem.kind === vscode.CompletionItemKind.Class
+				) {
+					return;
+				}
+				if (
+					tokenType === TokenType.Object &&
+					completionItem.kind === vscode.CompletionItemKind.Property
+				) {
+					return;
+				}
 				completionItems.push(completionItem);
 			});
 		}

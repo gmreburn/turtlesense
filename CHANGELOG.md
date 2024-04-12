@@ -4,6 +4,10 @@ All notable changes to the "turtlesense" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.10]
+
+- Filter suggestions based on whether position is on a predicate or object.
+
 ## [0.0.9]
 
 - New turtle sense icon.
