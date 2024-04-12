@@ -88,7 +88,6 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 	): vscode.ProviderResult<
 		vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>
 	> {
-		const completionItems: vscode.CompletionItem[] = [];
 		// Create a readable stream from the RDF data
 		const stream = Readable.from(document.getText());
 
@@ -103,13 +102,24 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 		parser.on("prefix", (prefix, iri) => {
 			prefixes[prefix] = iri.value;
 		});
-
 		// Await for parsing to complete
 		await new Promise<void>((resolve) => {
 			parser.on("error", resolve);
 			parser.on("data", resolve);
-		});
+		}).then(() => parser.destroy());
 
+		return this.getCompletionItems(prefixes, document, position, context);
+	}
+
+	// Created this to abstract from how the prefixes are attained. This function can be reused in other formats besides turtle
+	// TODO: read prefixes from class property instead of passing it?
+	async getCompletionItems(
+		prefixes: { [key: string]: string },
+		document: vscode.TextDocument,
+		position: vscode.Position,
+		context: vscode.CompletionContext
+	) {
+		const completionItems: vscode.CompletionItem[] = [];
 		var wordRange = document.getWordRangeAtPosition(position, /(\S*):(\S*)/);
 		const phrase = document.getText(wordRange);
 		console.debug("turtlesense:: phrase", phrase);
@@ -118,6 +128,7 @@ class RDFCompletionItemProvider implements vscode.CompletionItemProvider {
 		const prefix = words[0];
 		console.debug("turtlesense:: prefix requested", prefix);
 		console.debug("turtlesense:: prefixes detected", prefixes);
+
 		if (prefixes[prefix] !== undefined) {
 			const subjects = await querySubjectsFromIRI(prefixes[prefix]);
 			subjects.forEach((subject) => {
@@ -149,7 +160,7 @@ function createCompletionItem(
 	);
 	completionItem.detail = detail;
 	completionItem.documentation = new vscode.MarkdownString(
-		`Inserts "${label}" ${type}- ${documentation || detail}`
+		`Inserts "${label}" ${type}- \n\n${documentation || detail}`
 	);
 
 	return completionItem;
