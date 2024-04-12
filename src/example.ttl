@@ -30,3 +30,12 @@ ex:hasAge rdf:type rdf:Property ;
 ex:hasFriend rdf:type rdf:Property ;
     rdfs:domain ex:Person ;
     rdfs:range ex:Person .
+
+
+# limit owl:sameAs to properties from owl namespace.. do not show other classes (since it is a predicate)
+# for loc:Work, limit to only display classes, not properties (since it is an object)
+bf:Work a rdfs:Class ;
+    rdfs:label "Work"@en ;
+    rdfs:comment "A distinct intellectual or artistic creation."@en ;
+    owl:sameAs loc:Work ;
+    rdfs:subClassOf bf:Resource .
